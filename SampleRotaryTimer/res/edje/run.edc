@@ -1,0 +1,276 @@
+/*
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "../../inc/view_defines.h"
+#include "edc_defines.h"
+
+images {
+	image: IMAGE_FPATH_BOARD_RUN_BG COMP;
+	image: IMAGE_FPATH_BUTTON_SET_TIME COMP;
+	image: IMAGE_FPATH_BUTTON_STOP COMP;
+	image: IMAGE_FPATH_BUTTON_STOP_PRESSED COMP;
+	image: IMAGE_FPATH_INDICATOR_RUNNER_DOT COMP;
+	image: IMAGE_FPATH_INDICATOR_RUNNER_LINE_GLOW COMP;
+}
+
+collections {
+	group {
+		name: GRP_RUN;
+		parts {
+			part {
+				name: PART_MAIN_BG;
+				type: RECT;
+				mouse_events: 0;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.0 0.0;
+					}
+					rel2 {
+						relative: 1.0 1.0;
+					}
+				}
+			}
+
+			part {
+				name: PART_RUN_BOARD_RUN_BG;
+				type: IMAGE;
+				mouse_events: 0;
+				repeat_events: 0;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.0 0.0;
+					}
+					rel2 {
+						relative: 1.0 1.0;
+					}
+					image {
+						normal: IMAGE_FPATH_BOARD_RUN_BG;
+					}
+				}
+			}
+
+			part {
+				name: PART_RUN_PROGRESS;
+				type: IMAGE;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.0 0.0;
+					}
+					rel2 {
+						relative: 1.0 1.0;
+					}
+					image {
+						normal: IMAGE_FPATH_INDICATOR_RUNNER_LINE_GLOW;
+					}
+					map {
+						on: 1;
+						smooth: 1;
+						perspective_on: 1;
+						rotation {
+							z: 0;
+						}
+					}
+				}
+				clip_to: PART_RUN_CLIPPER;
+			}
+
+			part {
+				name: PART_RUN_DOT;
+				type: IMAGE;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.5-(23/360/2) 0.5-((143+11.5)/360);
+					}
+					rel2 {
+						relative: 0.5+(23/360/2) 0.5-((143-11.5)/360);
+					}
+					image {
+						normal: IMAGE_FPATH_INDICATOR_RUNNER_DOT;
+					}
+					map {
+						on: 1;
+						smooth: 1;
+						perspective_on: 1;
+						rotation {
+							center: PART_RUN_PROGRESS;
+							z: 0;
+						}
+					}
+				}
+			}
+
+			part {
+				name: PART_RUN_SET_TIME_BUTTON;
+				type: IMAGE;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.3389 0.1889;
+					}
+					rel2 {
+						relative: 0.3389+0.3194 0.1889+0.1056;
+					}
+					image {
+						normal: IMAGE_FPATH_BUTTON_SET_TIME;
+					}
+				}
+			}
+
+			part {
+				name: PART_RUN_STOP_BUTTON;
+				type: IMAGE;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.2139 0.7833;
+					}
+					rel2 {
+						relative: 0.2139+0.5722 0.7833+0.2167;
+					}
+					image {
+						normal: IMAGE_FPATH_BUTTON_STOP;
+					}
+				}
+				description {
+					state: STATE_BTN_PRESSED 0.0;
+					inherit: STATE_DEFAULT 0.0;
+					image {
+						normal: IMAGE_FPATH_BUTTON_STOP_PRESSED;
+					}
+				}
+			}
+
+			TIME_PART(PART_HOUR,   "00", 0.1139, 0.2417, 0.4500, 0.2167, FONT_SIZE_BOLD, FONT_STYLE_BOLD)
+			TIME_PART(PART_MINUTE, "00", 0.3778, 0.2417, 0.4500, 0.2167, FONT_SIZE_BOLD, FONT_STYLE_BOLD)
+			TIME_PART(PART_SECOND, "00", 0.6417, 0.2417, 0.4500, 0.2167, FONT_SIZE_BOLD, FONT_STYLE_BOLD)
+
+			TIME_PART("part_txt_hou", "HR",  0.1583, 0.1611, 0.3694, 0.0833, FONT_SIZE_TITLE, FONT_SIZE_BOLD)
+			TIME_PART("part_txt_min", "MIN", 0.4194, 0.1611, 0.3694, 0.0833, FONT_SIZE_TITLE, FONT_SIZE_BOLD)
+			TIME_PART("part_txt_sec", "SEC", 0.6806, 0.1611, 0.3694, 0.0833, FONT_SIZE_TITLE, FONT_SIZE_BOLD)
+
+			PART_COLON(PART_COLON_1, PART_HOUR, PART_MINUTE, 48, 179, 157);
+			PART_COLON(PART_COLON_2, PART_MINUTE, PART_SECOND, 48, 179, 157);
+
+			part {
+				name: PART_RUN_CLIPPER;
+				type: RECT;
+
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.0 0.0;
+					}
+					rel2 {
+						relative: 1.0 (256/360);
+					}
+				}
+
+			}
+
+			script {
+				public g_angle_curr;
+				public g_angle_next;
+				public g_anim_id = 0;
+
+				public _dot_animate(Float:angle) {
+					custom_state(PART:PART_RUN_DOT, STATE_DEFAULT, 0.0);
+					set_state_val(PART:PART_RUN_DOT, STATE_MAP_ROT_Z, angle);
+					set_state(PART:PART_RUN_DOT, STATE_CUSTOM, 0.0);
+				}
+
+				public _clipper_animate_progress(Float:angle) {
+					custom_state(PART:PART_RUN_PROGRESS, STATE_DEFAULT, 0.0);
+					custom_state(PART:PART_RUN_CLIPPER, STATE_DEFAULT, 0.0);
+
+					if (angle <= -90.0)
+						set_state_val(PART:PART_RUN_CLIPPER, STATE_REL2, 0.25, PART_CLIPPER_REL_2_Y);
+					else if (angle <= -15.0)
+						set_state_val(PART:PART_RUN_CLIPPER, STATE_REL2, 0.50, PART_CLIPPER_REL_2_Y);
+					else if (angle <= 30.0)
+						set_state_val(PART:PART_RUN_CLIPPER, STATE_REL2, 0.75, PART_CLIPPER_REL_2_Y);
+					else
+						set_state_val(PART:PART_RUN_CLIPPER, STATE_REL2, 1.00, PART_CLIPPER_REL_2_Y);
+
+					set_state_val(PART:PART_RUN_PROGRESS, STATE_MAP_ROT_Z, angle - 133);
+					set_state(PART:PART_RUN_CLIPPER, STATE_CUSTOM, 0.0);
+					set_state(PART:PART_RUN_PROGRESS, STATE_CUSTOM, 0.0);
+				}
+
+				public anim_cb(val, Float:pos) {
+					new Float:curr = get_float(g_angle_curr);
+					new Float:next = get_float(g_angle_next);
+					new Float:angle = pos * (next - curr) + curr;
+
+					_dot_animate(angle);
+					_clipper_animate_progress(angle);
+				}
+
+				public message(Msg_Type:type, id, ...) {
+					new Float:max = getarg(3);
+					new Float:current = max - getarg(2);
+					new Float:angle_total = DOT_ANGLE_END - DOT_ANGLE_START;
+					new Float:time_percentage = current / max;
+					new Float:angle_current = (angle_total * time_percentage) + DOT_ANGLE_START;
+					new Float:time_percentage_next = (current + 1) / max;
+					new Float:angle_next = (angle_total * time_percentage_next) + DOT_ANGLE_START;
+					new anim_id = get_int(g_anim_id);
+
+					set_float(g_angle_curr, angle_current);
+					set_float(g_angle_next, angle_next);
+
+					if ((type == MSG_INT_SET) && (id == MSG_ID_DOT_ANGLE)) {
+						cancel_anim(anim_id);
+
+						if (max == current)
+							return;
+
+						anim_id = anim(1.0, "anim_cb", 0);
+						set_int(g_anim_id, anim_id);
+					}
+				}
+			}
+
+			programs {
+				program {
+					signal: "mouse,down,1";
+					source: PART_RUN_STOP_BUTTON;
+					action: STATE_SET STATE_BTN_PRESSED 0.0;
+					target: PART_RUN_STOP_BUTTON;
+				}
+				program {
+					signal: "mouse,up,1";
+					source: PART_RUN_STOP_BUTTON;
+					action: STATE_SET STATE_DEFAULT 0.0;
+					target: PART_RUN_STOP_BUTTON;
+				}
+				program {
+					signal: "mouse,clicked,1";
+					source: PART_RUN_STOP_BUTTON;
+					action: SIGNAL_EMIT SIGNAL_VIEW_CHANGE "";
+				}
+				program {
+					signal: "mouse,clicked,1";
+					source: PART_RUN_SET_TIME_BUTTON;
+					action: SIGNAL_EMIT SIGNAL_SET_TIMER "";
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,239 @@
+/*
+ * Copyright (c) 2016 Samsung Electronics Co., Ltd. All rights reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include "../../inc/view_defines.h"
+#include "edc_defines.h"
+
+images {
+	image: IMAGE_FPATH_BOARD_SETUP_HOUR_BG COMP;
+	image: IMAGE_FPATH_BOARD_SETUP_MIN_SEC_BG COMP;
+	image: IMAGE_FPATH_INDICATOR_SETTER COMP;
+	image: IMAGE_FPATH_BUTTON_RESET COMP;
+	image: IMAGE_FPATH_BUTTON_START COMP;
+	image: IMAGE_FPATH_BUTTON_START_PRESSED COMP;
+}
+
+collections {
+	group {
+		name: GRP_SETUP;
+		parts {
+			part {
+				name: PART_MAIN_BG;
+				type: RECT;
+				mouse_events: 0;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.0 0.0;
+					}
+					rel2 {
+						relative: 1.0 1.0;
+					}
+				}
+			}
+
+			part {
+				name: PART_SETUP_BOARD_BG;
+				type: IMAGE;
+				mouse_events: 0;
+				repeat_events: 0;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.0 0.0;
+					}
+					rel2 {
+						relative: 1.0 1.0;
+					}
+					image {
+						normal: IMAGE_FPATH_BOARD_SETUP_HOUR_BG;
+					}
+					map {
+						on: 1;
+						smooth: 1;
+						perspective_on: 1;
+						rotation {
+							center: PART_MAIN_BG;
+							z: 0.0;
+						}
+					}
+				}
+			}
+
+			part {
+				name: PART_SETUP_RESET_BUTTON;
+				type: IMAGE;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.3389 0.1889;
+					}
+					rel2 {
+						relative: (0.3389 + 0.3194) (0.1889 + 0.1056);
+					}
+					image {
+						normal: IMAGE_FPATH_BUTTON_RESET;
+					}
+				}
+			}
+
+			PART_INDICATOR(PART_SETUP_INDICATOR_HOUR, 179, 179, 179, 32, 37)
+			PART_INDICATOR(PART_SETUP_INDICATOR_MIN,   60, 219, 192, 26, 30)
+			PART_INDICATOR(PART_SETUP_INDICATOR_SEC,  219, 144,   0, 20, 23)
+
+			part {
+				name: PART_SETUP_START_BUTTON;
+				type: IMAGE;
+				description {
+					state: STATE_DEFAULT 0.0;
+					rel1 {
+						relative: 0.2139 0.7833;
+					}
+					rel2 {
+						relative: (0.2139 + 0.5722) (0.7833 + 0.2167);
+					}
+					image {
+						normal: IMAGE_FPATH_BUTTON_START;
+					}
+				}
+
+				description {
+					state: STATE_BTN_PRESSED 0.0;
+					inherit: STATE_DEFAULT 0.0;
+					image {
+						normal: IMAGE_FPATH_BUTTON_START_PRESSED;
+					}
+				}
+			}
+
+			TIME_PART(PART_HOUR,   "00", 0.1917, 0.1944, 0.4139, 0.2167, FONT_SIZE_THIN, FONT_STYLE_THIN)
+			TIME_PART(PART_MINUTE, "00", 0.4083, 0.1944, 0.4139, 0.2167, FONT_SIZE_THIN, FONT_STYLE_THIN)
+			TIME_PART(PART_SECOND, "00", 0.6250, 0.1944, 0.4139, 0.2167, FONT_SIZE_THIN, FONT_STYLE_THIN)
+
+			PART_COLON(PART_COLON_1, PART_HOUR, PART_MINUTE, 182, 120, 0);
+			PART_COLON(PART_COLON_2, PART_MINUTE, PART_SECOND, 182, 120, 0);
+		}
+
+		script {
+			public _board_set_state(base_state[], img, Float:rot, Float:multip) {
+				custom_state(PART:PART_SETUP_BOARD_BG, base_state, 0.0);
+				set_state_val(PART:PART_SETUP_BOARD_BG, STATE_IMAGE, img);
+				set_state_val(PART:PART_SETUP_BOARD_BG, STATE_MAP_ROT_Z, -rot * multip);
+				set_state(PART:PART_SETUP_BOARD_BG, "custom", 0.0);
+			}
+
+			public _indicator_set_position(indicator_part, Float:value, Float:val_mul, Float:rot, Float:rot_mul) {
+				new Float:final_rot = (value * val_mul) - (rot * rot_mul);
+
+				custom_state(indicator_part, STATE_DEFAULT, 0.0);
+				set_state_val(indicator_part, STATE_MAP_ROT_Z, final_rot);
+				set_state(indicator_part, "custom", 0.0);
+			}
+
+			public message(Msg_Type:type, id, ...) {
+				new Float:hour = getarg(2);
+				new Float:minute = getarg(3);
+				new Float:second = getarg(4);
+
+				if (type == MSG_INT_SET) {
+					if (id == MSG_ID_SET_HOUR) {
+						_board_set_state(STATE_DEFAULT, IMAGE:IMAGE_FPATH_BOARD_SETUP_HOUR_BG, hour, 30.0);
+
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_HOUR, 0.0, 0.0, 0.0, 0.0);
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_MIN, minute, 6.0, hour, 30.0);
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_SEC, second, 6.0, hour, 30.0);
+					} else if (id == MSG_ID_SET_MINUTE) {
+						_board_set_state(STATE_DEFAULT, IMAGE:IMAGE_FPATH_BOARD_SETUP_MIN_SEC_BG, minute, 6.0);
+
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_HOUR, hour, 30.0, minute, 6.0);
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_MIN, 0.0,  0.0, 0.0, 0.0);
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_SEC, second, 6.0, minute, 6.0);
+					} else if (id == MSG_ID_SET_SECOND) {
+						_board_set_state(STATE_DEFAULT, IMAGE:IMAGE_FPATH_BOARD_SETUP_MIN_SEC_BG, second, 6.0);
+
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_HOUR, hour, 30.0, second, 6.0);
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_MIN, minute,  6.0, second, 6.0);
+						_indicator_set_position(PART:PART_SETUP_INDICATOR_SEC, 0.0,  0.0, 0.0, 0.0);
+					}
+				}
+			}
+		}
+
+		programs {
+			program {
+				signal: "mouse,down,1";
+				source: PART_SETUP_START_BUTTON;
+				action: STATE_SET STATE_BTN_PRESSED 0.0;
+				target: PART_SETUP_START_BUTTON;
+			}
+			program {
+				signal: "mouse,up,1";
+				source: PART_SETUP_START_BUTTON;
+				action: STATE_SET STATE_DEFAULT 0.0;
+				target: PART_SETUP_START_BUTTON;
+			}
+			program {
+				signal: "mouse,clicked,1";
+				source: PART_SETUP_START_BUTTON;
+				action: SIGNAL_EMIT SIGNAL_VIEW_CHANGE "";
+			}
+			program {
+				signal: "mouse,clicked,1";
+				source: PART_HOUR;
+				script {
+					set_state(PART:PART_HOUR, STATE_PART_SELECTED, 0.0);
+					set_state(PART:PART_MINUTE, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_SECOND, STATE_DEFAULT, 0.0);
+					emit(SIGNAL_PART_SELECTED, PART_HOUR);
+				}
+			}
+			program {
+				signal: "mouse,clicked,1";
+				source: PART_MINUTE;
+				script {
+					set_state(PART:PART_HOUR, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_MINUTE,STATE_PART_SELECTED, 0.0);
+					set_state(PART:PART_SECOND, STATE_DEFAULT, 0.0);
+					emit(SIGNAL_PART_SELECTED, PART_MINUTE);
+				}
+			}
+			program {
+				signal: "mouse,clicked,1";
+				source: PART_SECOND;
+				script {
+					set_state(PART:PART_HOUR, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_MINUTE, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_SECOND, STATE_PART_SELECTED, 0.0);
+					emit(SIGNAL_PART_SELECTED, PART_SECOND);
+				}
+			}
+			program {
+				signal: "mouse,clicked,1";
+				source: PART_SETUP_RESET_BUTTON;
+				script {
+					set_state(PART:PART_HOUR, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_MINUTE, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_SECOND, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_SETUP_BOARD_BG, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_SETUP_INDICATOR_HOUR, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_SETUP_INDICATOR_MIN, STATE_DEFAULT, 0.0);
+					set_state(PART:PART_SETUP_INDICATOR_SEC, STATE_DEFAULT, 0.0);
+					emit(SIGNAL_RESET_TIMER, "");
+				}
+			}
+		}
+	}
+}
