@@ -6,6 +6,8 @@ typedef struct appdata {
 	Evas_Object *label;
 } appdata_s;
 
+int BUTTON_STATE = 0;
+
 static void
 win_delete_request_cb(void *data, Evas_Object *obj, void *event_info)
 {
@@ -51,13 +53,42 @@ create_base_gui(appdata_s *ad)
 	/* Label */
 	/* Create an actual view of the base gui.
 	   Modify this part to change the view. */
-	ad->label = elm_label_add(ad->conform);
-	elm_object_text_set(ad->label, "<align=center>Hello Tizen</align>");
-	evas_object_size_hint_weight_set(ad->label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
-	elm_object_content_set(ad->conform, ad->label);
+//	ad->label = elm_label_add(ad->conform);
+//	elm_object_text_set(ad->label, "<align=center>Hello Tizen</align>");
+//	evas_object_size_hint_weight_set(ad->label, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+//	elm_object_content_set(ad->conform, ad->label);
+
+	Evas_Object *button;
+
+	/* Create a button */
+	button = elm_button_add(ad->conform);
+	elm_object_text_set(button, "<align=center>Hi, Daddy!</align>");
+	//elm_object_style_set(button, "bottom");
+	evas_object_size_hint_weight_set(button, EVAS_HINT_EXPAND, EVAS_HINT_EXPAND);
+	evas_object_smart_callback_add(button, "clicked", clicked_cb, ad);
+	elm_object_content_set(ad->conform, button);
 
 	/* Show window after base gui is set up */
 	evas_object_show(ad->win);
+}
+
+/* Callback for the "clicked" signal */
+/* Called when the button is clicked by the user */
+void
+clicked_cb(void *data, Evas_Object *obj, void *event_info)
+{
+	if (BUTTON_STATE == 0) {
+		BUTTON_STATE = 1;
+		elm_object_text_set(obj, "<align=center>Hi, Mommy!</align>");
+	}
+	else if (BUTTON_STATE == 1) {
+		BUTTON_STATE = 2;
+		elm_object_text_set(obj, "Hi, Bear!");
+	}
+	else {
+		BUTTON_STATE = 0;
+		elm_object_text_set(obj, "<align=center>Hi, Daddy!</align>");
+	}
 }
 
 static bool

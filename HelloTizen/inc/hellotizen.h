@@ -16,4 +16,6 @@
 #define PACKAGE "org.example.hellotizen"
 #endif
 
+void clicked_cb(void *data, Evas_Object *obj, void *event_info);
+
 #endif /* __hellotizen_H__ */
