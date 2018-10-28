@@ -5264,3 +5264,44 @@ java.lang.NullPointerException
 	at org.eclipse.equinox.launcher.Main.invokeFramework(Main.java:653)
 	at org.eclipse.equinox.launcher.Main.basicRun(Main.java:590)
 	at org.eclipse.equinox.launcher.Main.run(Main.java:1499)
+!SESSION 2018-10-26 08:54:33.716 -----------------------------------------------
+eclipse.buildId=2.5 
+java.version=1.8.0_191
+java.vendor=Oracle Corporation
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=en
+Command-line arguments:  -os win32 -ws win32 -arch x86_64
+
+!ENTRY org.eclipse.ui 2 0 2018-10-26 08:54:38.423
+!MESSAGE Warnings while parsing the images from the 'org.eclipse.ui.commandImages' extension point.
+!SUBENTRY 1 org.eclipse.ui 2 0 2018-10-26 08:54:38.423
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.RepositoriesViewRefresh'
+!SUBENTRY 1 org.eclipse.ui 2 0 2018-10-26 08:54:38.423
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.org.eclipse.egit.ui.AbortRebase'
+!SUBENTRY 1 org.eclipse.ui 2 0 2018-10-26 08:54:38.424
+!MESSAGE Cannot bind to an undefined command: plug-in='org.eclipse.egit.ui', id='org.eclipse.egit.ui.history.RenameBranch'
+
+!ENTRY org.eclipse.e4.ui.css.core 4 0 2018-10-26 08:54:40.682
+!MESSAGE CSS property 'unselected-hot-tab-color-background' has been deprecated: renamed as swt-unselected-hot-tab-color-background
+
+!ENTRY org.tizen.common.ui.Startup 1 0 2018-10-26 08:54:50.850
+!MESSAGE SDK Information: Path [C:\tizen-studio], Data Path [C:\tizen-studio-data], Platform Path [C:\tizen-studio\platforms\tizen-4.0\wearable]
+
+!ENTRY org.eclipse.egit.ui 2 0 2018-10-26 08:54:51.000
+!MESSAGE Warning: The environment variable HOME is not set. The following directory will be used to store the Git
+user global configuration and to define the default location to store repositories: 'C:\Users\thomas'. If this is
+not correct please set the HOME environment variable and restart Eclipse. Otherwise Git for Windows and
+EGit might behave differently since they see different configuration options.
+This warning can be switched off on the Team > Git > Confirmations and Warnings preference page.
+
+!ENTRY org.eclipse.launchbar.core 2 0 2018-10-26 09:23:21.005
+!MESSAGE Enablement expression is missing for descriptor type org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.eclipse.launchbar.core 2 0 2018-10-26 09:23:21.008
+!MESSAGE Enablement expression is missing for config provider for org.eclipse.cdt.debug.core.coreBuildDescriptorType
+
+!ENTRY org.tizen.common.connection.toolbar.TargetToolBarManager 4 0 2018-10-26 09:29:13.755
+!MESSAGE [2018.10.26 09:29:13][ERROR] TargetToolBarManager.java(390) - Failed to launch VM: [W-4.0-circle-x86-preview] is running now...
+
+
+!ENTRY org.tizen.common.connection 4 0 2018-10-26 09:29:13.767
+!MESSAGE Problem occurred while launching a emulator.
